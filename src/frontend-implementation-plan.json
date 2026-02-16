@@ -1,0 +1,162 @@
+{
+  "kind": "implementation_plan",
+  "version": "1.0",
+  "title": "SocialConsole PWA installability, offline support, and best-effort notifications",
+  "requirements": [
+    {
+      "id": "REQ-23",
+      "summary": "Add installable PWA support with manifest, metadata, icons, and React-driven service worker registration.",
+      "acceptanceCriteria": [
+        "The app provides a valid `manifest.webmanifest` (or equivalent) with name/short_name, start_url, display=standalone, theme_color/background_color, and icon entries.",
+        "On supported browsers, the app can be installed and launches in standalone mode.",
+        "A service worker is registered in production builds and controls the page after first load."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/public/manifest.webmanifest",
+          "operation": "create",
+          "description": "Create a valid web app manifest for SocialConsole (name/short_name, start_url, standalone display, theme/background colors) and include icon entries that reference the generated assets under frontend/public/assets/generated."
+        },
+        {
+          "path": "frontend/index.html",
+          "operation": "modify",
+          "description": "Add PWA-related metadata and links: reference the web app manifest, set theme-color/background-related metadata, and ensure install surfaces can discover the manifest and icons."
+        },
+        {
+          "path": "frontend/public/service-worker.js",
+          "operation": "create",
+          "description": "Add a service worker script that can be registered by the React app and is capable of controlling the page after first load (including install/activate lifecycle and fetch handling for offline-capable navigation)."
+        },
+        {
+          "path": "frontend/src/App.tsx",
+          "operation": "modify",
+          "description": "Register the service worker from within the React app (without modifying frontend/src/main.tsx) using a production-only, feature-detected registration flow and provide a safe fallback when unsupported."
+        }
+      ]
+    },
+    {
+      "id": "REQ-24",
+      "summary": "Implement offline support via app-shell caching and clear offline UI behavior with graceful handling of failed network requests.",
+      "acceptanceCriteria": [
+        "After at least one successful online load, reopening the app with the device offline loads the UI (app shell) instead of failing with a browser error page.",
+        "When offline, the UI clearly indicates offline status.",
+        "Network requests that fail due to being offline do not crash the app; errors are handled gracefully."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/public/service-worker.js",
+          "operation": "modify",
+          "description": "Implement offline-capable caching behavior for the app shell (navigation requests return cached HTML when offline after at least one online load) and add cache strategies for same-origin static assets (JS/CSS/images/icons)."
+        },
+        {
+          "path": "frontend/src/hooks/useOnlineStatus.ts",
+          "operation": "create",
+          "description": "Create a small hook that tracks online/offline state using navigator.onLine and window online/offline events, exposing a stable boolean for UI and polling control."
+        },
+        {
+          "path": "frontend/src/components/OfflineBanner.tsx",
+          "operation": "create",
+          "description": "Create an offline status banner component to clearly indicate when the app is offline. Use shadcn-ui primitives (e.g., Alert) to render the banner; verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/components/ChatLayout.tsx",
+          "operation": "modify",
+          "description": "Wire the OfflineBanner into the main authenticated app layout so offline status is visible during normal use (without adding new top-level routes)."
+        },
+        {
+          "path": "frontend/src/hooks/useQueries.ts",
+          "operation": "modify",
+          "description": "Update polling/query behavior to be offline-aware (e.g., pause/refetch intervals while offline and avoid repeated failing retries), and ensure errors caused by offline state are surfaced gracefully instead of crashing the app."
+        },
+        {
+          "path": "frontend/src/components/ChatArea.tsx",
+          "operation": "modify",
+          "description": "Adjust message loading empty/error states to clearly communicate offline conditions (e.g., show an offline-friendly message when requests fail due to being offline) while keeping UI responsive."
+        }
+      ]
+    },
+    {
+      "id": "REQ-25",
+      "summary": "Add best-effort in-app notifications for new messages using the Web Notifications API with a user-controlled setting and permission prompts only after interaction.",
+      "acceptanceCriteria": [
+        "There is an in-app setting to enable/disable notifications.",
+        "The app requests notification permission only in response to a user action (e.g., clicking “Enable notifications”).",
+        "When notifications are enabled and the app detects newly arrived messages via existing polling, a system notification is shown with channel and sender/message context (when available).",
+        "If notification permission is denied or unsupported, the app continues to function and provides a clear in-app explanation/state."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/hooks/useNotifications.ts",
+          "operation": "create",
+          "description": "Create a notifications hook that stores an enable/disable preference (e.g., localStorage), exposes current permission/support state, and provides an explicit user-action method to request permission (no automatic prompting)."
+        },
+        {
+          "path": "frontend/src/components/Header.tsx",
+          "operation": "modify",
+          "description": "Add a user-accessible notifications enable/disable control within the existing header dropdown (or similar existing UI), including clear messaging for unsupported/denied states. Use shadcn-ui DropdownMenu primitives to present the setting; verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/components/ChatArea.tsx",
+          "operation": "modify",
+          "description": "Detect newly arrived messages from existing polling updates and, when notifications are enabled, show a system notification with channel and sender/message context when available. Avoid notifying for the user’s own messages and ensure behavior is safe in background tabs."
+        }
+      ]
+    },
+    {
+      "id": "REQ-26",
+      "summary": "Provide an offline-friendly message compose experience by preventing message sends while offline and clearly communicating the state to the user.",
+      "acceptanceCriteria": [
+        "When the device is offline, the message input clearly indicates that sending is unavailable (or that messages are queued as drafts).",
+        "No backend mutation is attempted while offline (no repeated error spam), and the UI remains responsive.",
+        "When the device returns online, the UI updates accordingly and the user can send messages successfully."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/components/MessageInput.tsx",
+          "operation": "modify",
+          "description": "Make the compose UI offline-aware: disable/guard send actions while offline, show a clear explanation in the input area, and ensure no send mutation is invoked when offline (preventing repeated error spam)."
+        },
+        {
+          "path": "frontend/src/hooks/useOnlineStatus.ts",
+          "operation": "modify",
+          "description": "Extend online/offline tracking as needed to support immediate UI updates on connectivity changes used by the message compose flow."
+        },
+        {
+          "path": "frontend/src/hooks/useQueries.ts",
+          "operation": "modify",
+          "description": "Add a lightweight offline guard to the send-message mutation path (and other relevant mutations) so backend mutation attempts are not initiated while offline, while keeping the app responsive."
+        }
+      ]
+    },
+    {
+      "id": "REQ-27",
+      "summary": "Add required generated PWA icon assets under frontend/public/assets/generated and reference them from the manifest.",
+      "acceptanceCriteria": [
+        "All required generated icon files exist in `frontend/public/assets/generated` and are referenced by the web app manifest.",
+        "Installed app uses the provided icons (no generic/blank icon)."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/public/assets/generated/pwa-icon.dim_512x512.png",
+          "operation": "create",
+          "description": "Add the generated PWA icon asset file at the required path: frontend/public/assets/generated/pwa-icon.dim_512x512.png."
+        },
+        {
+          "path": "frontend/public/assets/generated/pwa-icon.dim_192x192.png",
+          "operation": "create",
+          "description": "Add the generated PWA icon asset file at the required path: frontend/public/assets/generated/pwa-icon.dim_192x192.png."
+        },
+        {
+          "path": "frontend/public/assets/generated/pwa-icon-maskable.dim_512x512.png",
+          "operation": "create",
+          "description": "Add the generated maskable PWA icon asset file at the required path: frontend/public/assets/generated/pwa-icon-maskable.dim_512x512.png."
+        },
+        {
+          "path": "frontend/public/manifest.webmanifest",
+          "operation": "modify",
+          "description": "Reference the required generated icon files (frontend/public/assets/generated/pwa-icon.dim_512x512.png, frontend/public/assets/generated/pwa-icon.dim_192x192.png, frontend/public/assets/generated/pwa-icon-maskable.dim_512x512.png) from the manifest with appropriate sizes and purpose (including maskable)."
+        }
+      ]
+    }
+  ]
+}

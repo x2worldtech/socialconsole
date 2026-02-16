@@ -1,0 +1,116 @@
+{
+  "kind": "build_request",
+  "title": "Convert SocialConsole to an installable PWA with offline support and best-effort notifications",
+  "priority": "normal",
+  "requirements": [
+    {
+      "id": "REQ-23",
+      "text": "Add Progressive Web App (PWA) support so SocialConsole is installable on mobile and desktop, including a valid web app manifest, app icons, correct metadata, and a service worker registration from the React app.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-1"
+        ],
+        "quotes": [
+          "ja als PWA mit push benachrichtigungen und offline support"
+        ]
+      },
+      "acceptanceCriteria": [
+        "The app provides a valid `manifest.webmanifest` (or equivalent) with name/short_name, start_url, display=standalone, theme_color/background_color, and icon entries.",
+        "On supported browsers, the app can be installed and launches in standalone mode.",
+        "A service worker is registered in production builds and controls the page after first load."
+      ]
+    },
+    {
+      "id": "REQ-24",
+      "text": "Implement offline support for the PWA: cache the app shell (HTML/JS/CSS/static assets) for offline launch, and provide clear offline UI behavior (banner/empty-state messaging) when the network is unavailable.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-1"
+        ],
+        "quotes": [
+          "offline support"
+        ]
+      },
+      "acceptanceCriteria": [
+        "After at least one successful online load, reopening the app with the device offline loads the UI (app shell) instead of failing with a browser error page.",
+        "When offline, the UI clearly indicates offline status.",
+        "Network requests that fail due to being offline do not crash the app; errors are handled gracefully."
+      ]
+    },
+    {
+      "id": "REQ-25",
+      "text": "Add best-effort notifications using the Web Notifications API for new channel messages while the app is running (foreground or background tab), with a user-controlled enable/disable setting and permission prompt only after user interaction.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-1"
+        ],
+        "quotes": [
+          "push benachrichtigungen",
+          "wenn eine nachricht in einem channel kommt"
+        ]
+      },
+      "acceptanceCriteria": [
+        "There is an in-app setting to enable/disable notifications.",
+        "The app requests notification permission only in response to a user action (e.g., clicking “Enable notifications”).",
+        "When notifications are enabled and the app detects newly arrived messages via existing polling, a system notification is shown with channel and sender/message context (when available).",
+        "If notification permission is denied or unsupported, the app continues to function and provides a clear in-app explanation/state."
+      ]
+    },
+    {
+      "id": "REQ-26",
+      "text": "Add an offline-friendly message compose experience: when offline, prevent sending messages to the backend and instead show a clear state (disabled send + explanation), or queue drafts locally and allow the user to resend once connectivity returns.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-1"
+        ],
+        "quotes": [
+          "offline support"
+        ]
+      },
+      "acceptanceCriteria": [
+        "When the device is offline, the message input clearly indicates that sending is unavailable (or that messages are queued as drafts).",
+        "No backend mutation is attempted while offline (no repeated error spam), and the UI remains responsive.",
+        "When the device returns online, the UI updates accordingly and the user can send messages successfully."
+      ]
+    },
+    {
+      "id": "REQ-27",
+      "text": "Add required PWA static assets (generated icons) to `frontend/public/assets/generated` and reference them from the manifest so install surfaces show proper app branding.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-1"
+        ],
+        "quotes": [
+          "als PWA"
+        ]
+      },
+      "acceptanceCriteria": [
+        "All required generated icon files exist in `frontend/public/assets/generated` and are referenced by the web app manifest.",
+        "Installed app uses the provided icons (no generic/blank icon)."
+      ]
+    }
+  ],
+  "constraints": [
+    "Do not edit files under `frontend/src/components/ui` (compose them instead).",
+    "Do not modify immutable paths: `frontend/src/hooks/useInternetIdentity.ts`, `frontend/src/hooks/useInternetIdentity.tsx`, `frontend/src/hooks/useActor.ts`, `frontend/src/main.tsx`, `frontend/src/components/ui`.",
+    "Backend must remain a single Motoko actor in `backend/main.mo`; only add `backend/migration.mo` if a stable-state upgrade is required."
+  ],
+  "nonGoals": [
+    "True mobile push notifications that arrive while the app is fully closed (terminated) are out of scope for this build on this platform.",
+    "Implementing WebSocket-based realtime messaging is out of scope.",
+    "Adding third-party notification providers (FCM/APNs) is out of scope."
+  ],
+  "imageRequirements": {
+    "required": [
+      "PWA app icon, rounded-square, high-contrast, simple glyph on solid background (pwa-icon.dim_512x512.png)",
+      "PWA app icon, rounded-square, high-contrast, simple glyph on solid background (pwa-icon.dim_192x192.png)",
+      "PWA maskable app icon with safe padding for Android adaptive masks (pwa-icon-maskable.dim_512x512.png)"
+    ],
+    "edits": []
+  }
+}

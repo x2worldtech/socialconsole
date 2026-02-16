@@ -1,0 +1,117 @@
+{
+  "kind": "feature_evidence_report",
+  "features": [
+    {
+      "featureId": "feature-add-progressive-web-app-pwa-support-so-socialconsole-is-installable-on-mobile-and-desktop-including-a-valid-web-app-manifest-app-icons-correct-metadata-and-a-service-worker-registration-from-the-react-app",
+      "featureTitle": "Add Progressive Web App (PWA) support so SocialConsole is installable on mobile and desktop, including a valid web app manifest, app icons, correct metadata, and a service worker registration from the React app.",
+      "files": [
+        "frontend/index.html",
+        "frontend/public/manifest.webmanifest",
+        "frontend/public/service-worker.js",
+        "frontend/src/App.tsx"
+      ],
+      "components": [
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "authorization@4.0.0",
+        "core-infrastructure@1.0.2",
+        "initial-app@1.0.0",
+        "blob-storage@4.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-23"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-implement-offline-support-for-the-pwa-cache-the-app-shell-html-js-css-static-assets-for-offline-launch-and-provide-clear-offline-ui-behavior-banner-empty-state-messaging-when-the-network-is-unavailable",
+      "featureTitle": "Implement offline support for the PWA: cache the app shell (HTML/JS/CSS/static assets) for offline launch, and provide clear offline UI behavior (banner/empty-state messaging) when the network is unavailable.",
+      "files": [
+        "frontend/public/service-worker.js",
+        "frontend/src/components/ChatArea.tsx",
+        "frontend/src/components/ChatLayout.tsx",
+        "frontend/src/components/OfflineBanner.tsx",
+        "frontend/src/hooks/useOnlineStatus.ts",
+        "frontend/src/hooks/useQueries.ts"
+      ],
+      "components": [
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "authorization@4.0.0",
+        "core-infrastructure@1.0.2",
+        "initial-app@1.0.0",
+        "blob-storage@4.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-24"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-add-best-effort-notifications-using-the-web-notifications-api-for-new-channel-messages-while-the-app-is-running-foreground-or-background-tab-with-a-user-controlled-enable-disable-setting-and-permission-prompt-only-after-user-interaction",
+      "featureTitle": "Add best-effort notifications using the Web Notifications API for new channel messages while the app is running (foreground or background tab), with a user-controlled enable/disable setting and permission prompt only after user interaction.",
+      "files": [
+        "frontend/src/components/ChatArea.tsx",
+        "frontend/src/components/Header.tsx",
+        "frontend/src/hooks/useNotifications.ts"
+      ],
+      "components": [
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "authorization@4.0.0",
+        "core-infrastructure@1.0.2",
+        "initial-app@1.0.0",
+        "blob-storage@4.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-25"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-add-an-offline-friendly-message-compose-experience-when-offline-prevent-sending-messages-to-the-backend-and-instead-show-a-clear-state-disabled-send-explanation-or-queue-drafts-locally-and-allow-the-user-to-resend-once-connectivity-returns",
+      "featureTitle": "Add an offline-friendly message compose experience: when offline, prevent sending messages to the backend and instead show a clear state (disabled send + explanation), or queue drafts locally and allow the user to resend once connectivity returns.",
+      "files": [
+        "frontend/src/components/MessageInput.tsx",
+        "frontend/src/hooks/useOnlineStatus.ts",
+        "frontend/src/hooks/useQueries.ts"
+      ],
+      "components": [
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "authorization@4.0.0",
+        "core-infrastructure@1.0.2",
+        "initial-app@1.0.0",
+        "blob-storage@4.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-26"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-add-required-pwa-static-assets-generated-icons-to-frontend-public-assets-generated-and-reference-them-from-the-manifest-so-install-surfaces-show-proper-app-branding",
+      "featureTitle": "Add required PWA static assets (generated icons) to `frontend/public/assets/generated` and reference them from the manifest so install surfaces show proper app branding.",
+      "files": [
+        "frontend/public/manifest.webmanifest"
+      ],
+      "components": [
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "authorization@4.0.0",
+        "core-infrastructure@1.0.2",
+        "initial-app@1.0.0",
+        "blob-storage@4.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-27"
+      ],
+      "confidence": "high"
+    }
+  ]
+}

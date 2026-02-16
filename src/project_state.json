@@ -1,0 +1,338 @@
+{
+  "schemaVersion": "1.0.0",
+  "projectStateVersion": 3,
+  "summary": "SocialConsole is a command-driven channel chat application built with a React + TypeScript + Tailwind (shadcn-ui) frontend and a Motoko canister backend on the Internet Computer. Users authenticate via Internet Identity; an identity-aware backend actor is created and used through React Query hooks to manage channels, memberships, messages, user profiles, and global app statistics. The app supports creating/joining/leaving channels (including random join), per-channel admin settings (random-join toggle and max-member limit), WhatsApp-style message bubbles with URL linkification, and attachments (images/GIFs/documents/voice messages) backed by ExternalBlob blob-storage primitives. The backend tracks all-time statistics and a gamified XP/level progression system (XP for sending messages and for channel creators when users join) surfaced in the UI via a small header progress bar and rotating statistics on the start/empty state screen.",
+  "existing_features": [
+    {
+      "id": "IF-1",
+      "title": "Internet Identity authentication provider (login/logout + persisted delegation)",
+      "synonyms": [
+        "AuthClient integration",
+        "II login"
+      ],
+      "description": "Provides a React context that initializes an AuthClient, restores an existing authenticated identity on reload, supports login via the configured II provider, and supports logout (clearing identity and resetting state).",
+      "reqIds": [],
+      "version": 1
+    },
+    {
+      "id": "IF-2",
+      "title": "Identity-aware backend actor initialization with query invalidation",
+      "synonyms": [
+        "useActor",
+        "useActorExtended"
+      ],
+      "description": "Creates an anonymous actor when not authenticated and an authenticated actor when identity is present. When the actor changes, React Query caches are invalidated/refetched so channel/profile/message data stays consistent with the current identity.",
+      "reqIds": [],
+      "version": 1
+    },
+    {
+      "id": "IF-3",
+      "title": "Role-based access control with admin bootstrap secret",
+      "synonyms": [
+        "AccessControl",
+        "MixinAuthorization"
+      ],
+      "description": "Motoko backend includes role tracking (#guest/#user/#admin). A shared initialization endpoint compares a user-provided secret with an environment-provided admin token to assign the first matching principal as admin; other authenticated principals become users. Includes role queries and admin checks.",
+      "reqIds": [],
+      "version": 1
+    },
+    {
+      "id": "IF-4",
+      "title": "User profile fetch/save and first-time profile setup modal",
+      "synonyms": [
+        "ProfileSetupModal",
+        "saveCallerUserProfile"
+      ],
+      "description": "Authenticated users can fetch and persist a UserProfile (username, joinedChannels, xp, level). If no profile exists for the authenticated caller, the UI prompts for username and saves an initial profile.",
+      "reqIds": [],
+      "version": 1
+    },
+    {
+      "id": "IF-5",
+      "title": "XP + level progression system with progress query and header UI",
+      "synonyms": [
+        "LevelProgressBar",
+        "getCallerUserLevelProgress"
+      ],
+      "description": "Backend awards XP on message send and to channel creators when users join; calculates a level and fractional progress to next level. Frontend polls progress and displays it as a compact level label and animated progress bar in the header.",
+      "reqIds": [],
+      "version": 1
+    },
+    {
+      "id": "IF-6",
+      "title": "Global all-time app statistics API + rotating empty-state display",
+      "synonyms": [
+        "getGlobalAppStatistics",
+        "RotatingAppStatistics"
+      ],
+      "description": "Backend tracks all-time totals (channels created, registered users, messages sent, total XP gained). Frontend periodically refetches and shows a single large stat at a time with fade transitions on the start/empty state screen.",
+      "reqIds": [],
+      "version": 1
+    },
+    {
+      "id": "IF-7",
+      "title": "Channel creation (authenticated) with optimistic channel list updates",
+      "synonyms": [
+        "/create",
+        "createChannel"
+      ],
+      "description": "Authenticated users can create ASCII-only channels. Frontend provides a slash command to create, optimistically inserts the new channel into cached channel lists, and invalidates relevant queries on completion.",
+      "reqIds": [],
+      "version": 1
+    },
+    {
+      "id": "IF-8",
+      "title": "Join channel by name with capacity enforcement",
+      "synonyms": [
+        "/join",
+        "joinChannel"
+      ],
+      "description": "Authenticated users can join channels by name. Backend enforces membership rules and optional maxMembers capacity. Frontend performs optimistic cache updates and displays error toasts (including a specific message for full channels).",
+      "reqIds": [],
+      "version": 1
+    },
+    {
+      "id": "IF-9",
+      "title": "Random join for public channels that allow random joining",
+      "synonyms": [
+        "/join random",
+        "joinRandomChannel"
+      ],
+      "description": "Backend selects a joinable, non-private channel with allowRandomJoin enabled that the caller hasn’t joined and that isn’t full, then joins the caller and returns the channel name. Frontend exposes a command and shows success/failure toasts.",
+      "reqIds": [],
+      "version": 1
+    },
+    {
+      "id": "IF-10",
+      "title": "Leave channel with creator delete option",
+      "synonyms": [
+        "/leave",
+        "LeaveChannelDialog"
+      ],
+      "description": "Authenticated users can leave channels. Channel creators can optionally delete the channel (removing channel + message history and removing it from all users). Frontend shows a confirmation dialog that offers delete vs leave-only for creators.",
+      "reqIds": [],
+      "version": 1
+    },
+    {
+      "id": "IF-11",
+      "title": "Channel settings: allow/disallow random joining (admin only)",
+      "synonyms": [
+        "allowRandomJoin toggle",
+        "setRandomJoinEnabled"
+      ],
+      "description": "Channel creators can enable/disable random joining for their channel. Frontend reads the setting and updates it via an optimistic mutation with toast feedback.",
+      "reqIds": [],
+      "version": 1
+    },
+    {
+      "id": "IF-12",
+      "title": "Channel settings: max member limit management (admin only)",
+      "synonyms": [
+        "capacity limit",
+        "setChannelMaxMembers"
+      ],
+      "description": "Channel creators can set/remove an optional maximum member limit. Backend validates limits (>=1 and not lower than current members). Frontend provides a switch + numeric input, saves changes, and performs optimistic updates.",
+      "reqIds": [],
+      "version": 1
+    },
+    {
+      "id": "IF-13",
+      "title": "Real-time-ish channel messaging with polling and optimistic send",
+      "synonyms": [
+        "sendMessage",
+        "getChannelMessages"
+      ],
+      "description": "Authenticated channel members can send messages; backend validates channel existence and membership. Frontend polls messages, appends optimistic messages on send, and invalidates message/level/stats queries on settle.",
+      "reqIds": [],
+      "version": 1
+    },
+    {
+      "id": "IF-14",
+      "title": "Media attachments using ExternalBlob (images, GIFs, documents)",
+      "synonyms": [
+        "MediaLibraryDialog",
+        "ExternalBlob attachments"
+      ],
+      "description": "Users can select files (with type/size validation), convert them to ExternalBlob with upload progress tracking, send them as message attachments, and render/download them in the message UI (images/GIFs inline; documents downloadable).",
+      "reqIds": [],
+      "version": 1
+    },
+    {
+      "id": "IF-15",
+      "title": "Voice messages: record, preview, send, and inline playback",
+      "synonyms": [
+        "useVoiceRecorder",
+        "VoiceRecorderPanel",
+        "VoiceMessagePlayer"
+      ],
+      "description": "Adds voice message recording via MediaRecorder with duration tracking and live audio-level detection. UI supports recording and preview states, discarding, and sending as an attachment; playback renders inline with play/pause and a progress indicator.",
+      "reqIds": [],
+      "version": 1
+    },
+    {
+      "id": "IF-16",
+      "title": "WhatsApp-style message UI with URL linkification",
+      "synonyms": [
+        "MessageBubble",
+        "parseTextWithLinks"
+      ],
+      "description": "Messages render as left/right chat bubbles with timestamps and avatars. Text is parsed for http/https links and rendered as clickable safe external anchors with theme-aware styling.",
+      "reqIds": [],
+      "version": 1
+    },
+    {
+      "id": "IF-17",
+      "title": "Responsive app shell with mobile-safe layout and collapsible sidebar",
+      "synonyms": [
+        "ChatLayout responsive UI",
+        "mobile safe area handling"
+      ],
+      "description": "Implements a fixed header, responsive/collapsible sidebar (with mobile overlay), scrollable message area, and a bottom input container that respects mobile safe-area insets and avoids viewport issues.",
+      "reqIds": [],
+      "version": 1
+    },
+    {
+      "id": "IF-18",
+      "title": "Theme switching (light/dark)",
+      "synonyms": [
+        "next-themes toggle"
+      ],
+      "description": "Header includes a theme toggle using next-themes; Tailwind theme variables provide consistent light/dark styling across the app.",
+      "reqIds": [],
+      "version": 1
+    },
+    {
+      "id": "IF-19",
+      "title": "Onboarding/empty-state command education carousel + animated command placeholder",
+      "synonyms": [
+        "CommandEducationCenter",
+        "MessageInput animated examples"
+      ],
+      "description": "When no channel is active, the UI shows a rotating help panel explaining available commands. The message input also displays an animated typed/backspaced sequence of example commands when idle.",
+      "reqIds": [],
+      "version": 1
+    },
+    {
+      "id": "IF-20",
+      "title": "Blob-storage maintenance endpoints (gateway auth, dead-blob pruning, cashier refill)",
+      "synonyms": [
+        "MixinStorage",
+        "storage GC/pruning"
+      ],
+      "description": "Backend includes a storage mixin exposing endpoints to update authorized gateway principals, list dead blobs to delete, confirm deletion (triggering GC), check blob liveness, and refill a cashier canister with cycles (guarded by a cashier principal).",
+      "reqIds": [],
+      "version": 1
+    },
+    {
+      "id": "IF-21",
+      "title": "Empty-state welcome heading with inline icon alignment",
+      "synonyms": [
+        "Start screen welcome heading icon",
+        "REQ-22 UI tweak"
+      ],
+      "description": "The empty/start state heading “Welcome to SocialConsole” includes a small inline symbol/icon to the right of the text, aligned neatly and sized responsively across mobile/desktop.",
+      "reqIds": [
+        "REQ-22"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-progressive-web-app-pwa-support-so-socialconsole-is-installable-on-mobile-and-desktop-including-a-valid-web-app-manifest-app-icons-correct-metadata-and-a-service-worker-registration-from-the-react-app",
+      "title": "Add Progressive Web App (PWA) support so SocialConsole is installable on mobile and desktop, including a valid web app manifest, app icons, correct metadata, and a service worker registration from the React app.",
+      "reqIds": [
+        "REQ-23"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-implement-offline-support-for-the-pwa-cache-the-app-shell-html-js-css-static-assets-for-offline-launch-and-provide-clear-offline-ui-behavior-banner-empty-state-messaging-when-the-network-is-unavailable",
+      "title": "Implement offline support for the PWA: cache the app shell (HTML/JS/CSS/static assets) for offline launch, and provide clear offline UI behavior (banner/empty-state messaging) when the network is unavailable.",
+      "reqIds": [
+        "REQ-24"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-best-effort-notifications-using-the-web-notifications-api-for-new-channel-messages-while-the-app-is-running-foreground-or-background-tab-with-a-user-controlled-enable-disable-setting-and-permission-prompt-only-after-user-interaction",
+      "title": "Add best-effort notifications using the Web Notifications API for new channel messages while the app is running (foreground or background tab), with a user-controlled enable/disable setting and permission prompt only after user interaction.",
+      "reqIds": [
+        "REQ-25"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-an-offline-friendly-message-compose-experience-when-offline-prevent-sending-messages-to-the-backend-and-instead-show-a-clear-state-disabled-send-explanation-or-queue-drafts-locally-and-allow-the-user-to-resend-once-connectivity-returns",
+      "title": "Add an offline-friendly message compose experience: when offline, prevent sending messages to the backend and instead show a clear state (disabled send + explanation), or queue drafts locally and allow the user to resend once connectivity returns.",
+      "reqIds": [
+        "REQ-26"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-required-pwa-static-assets-generated-icons-to-frontend-public-assets-generated-and-reference-them-from-the-manifest-so-install-surfaces-show-proper-app-branding",
+      "title": "Add required PWA static assets (generated icons) to `frontend/public/assets/generated` and reference them from the manifest so install surfaces show proper app branding.",
+      "reqIds": [
+        "REQ-27"
+      ],
+      "version": 1
+    }
+  ],
+  "new_feature_requests": [
+    {
+      "id": "AR-1",
+      "summary": "Convert SocialConsole to an installable PWA with offline support and mobile push notifications when messages arrive while the app is closed",
+      "reqIds": [],
+      "status": "pending"
+    }
+  ],
+  "architectural_notes": [
+    "Frontend uses React + TypeScript with @tanstack/react-query for caching, retries, polling/refetch intervals, and optimistic updates.",
+    "Authentication is handled via an InternetIdentityProvider (AuthClient) context that restores stored delegations and exposes login/logout state.",
+    "Backend integration uses an identity-aware DFINITY actor factory (createActorWithConfig); actor changes invalidate/refetch non-actor queries.",
+    "Backend is a Motoko actor using mo:core Map/Set/List for in-canister state (channels, memberships, profiles, messages, appStatistics).",
+    "Authorization is implemented via an AccessControl module composed into the actor using a Motoko mixin (MixinAuthorization) with an environment-backed admin bootstrap secret.",
+    "Attachments use Storage.ExternalBlob/ExternalBlob, enabling direct URLs and byte downloads; frontend tracks upload progress via withUploadProgress.",
+    "Voice messages are recorded client-side via MediaRecorder + Web Audio API (live audio-level detection) and rendered with a dedicated inline player component.",
+    "UI is mobile-first and responsive (fixed header, collapsible sidebar, safe-area padding), with theme switching via next-themes and Tailwind CSS variables (OKLCH).",
+    "Add PWA support: web app manifest + service worker with caching strategy for offline/standalone install experience.",
+    "Implement push notifications pipeline for new messages (subscription management + backend trigger) to notify users outside the app."
+  ],
+  "known_issues": [
+    "Blob-storage cashier env var appears misspelled as \"CAFFFEINE_STORAGE_CASHIER_PRINCIPAL\" (extra 'F') in Storage.mo and associated trap messages, likely breaking cashier/gateway updates unless deployed with the same typo.",
+    "Access-control initialization traps if \"CAFFEINE_ADMIN_TOKEN\" is not set; this can prevent authenticated actor initialization and effectively block app usage in misconfigured deployments.",
+    "AccessControl.getUserRole traps for non-anonymous principals that were not registered via initialization; any backend call made before successful initialization can fail hard.",
+    "Frontend implies guests can run /join and /leave, but backend join/leave require #user permission (authenticated/registered), so guest channel operations will fail with Unauthorized traps.",
+    "useActorExtended attempts admin bootstrap via assignCallerUserRole (admin-only) rather than _initializeAccessControlWithSecret; this likely never succeeds and creates duplicated/competing actor initialization logic with useActor.",
+    "LiveRecordingWaveform re-runs its effect on every audioLevel update (dependency array), recreating animation/resize handlers frequently and risking performance/memory issues.",
+    "useVoiceRecorder types stopRecording as returning void in the exported controls interface, but the implementation returns a Promise; consumers may misuse it (awaiting or not) inconsistently.",
+    "Two different CSS theme files exist (frontend/index.css and frontend/src/index.css); only src/index.css is imported by the app, which can lead to config drift/confusion.",
+    "getAccessibleChannels returns only channels the caller has already joined (not broadly “accessible/discoverable” channels), so naming/UI semantics may be misleading.",
+    "Backend state (persistentState) is not declared stable and there are no preupgrade/postupgrade hooks; canister upgrades would likely reset state."
+  ],
+  "isFixRequest": false,
+  "imageRequirements": "## Required Images\n- PWA app icon, rounded-square, high-contrast, simple glyph on solid background (pwa-icon.dim_512x512.png)\n- PWA app icon, rounded-square, high-contrast, simple glyph on solid background (pwa-icon.dim_192x192.png)\n- PWA maskable app icon with safe padding for Android adaptive masks (pwa-icon-maskable.dim_512x512.png)",
+  "generatedImages": [
+    {
+      "filename": "pwa-icon.dim_512x512.png",
+      "description": "PWA app icon, rounded-square, high-contrast, simple glyph on solid background",
+      "targetWidth": 512,
+      "targetHeight": 512
+    },
+    {
+      "filename": "pwa-icon.dim_192x192.png",
+      "description": "PWA app icon, rounded-square, high-contrast, simple glyph on solid background",
+      "targetWidth": 192,
+      "targetHeight": 192
+    },
+    {
+      "filename": "pwa-icon-maskable.dim_512x512.png",
+      "description": "PWA maskable app icon with safe padding for Android adaptive masks",
+      "targetWidth": 512,
+      "targetHeight": 512
+    }
+  ],
+  "gameProjectType": "none",
+  "projectName": "SocialConsole",
+  "clarification_mode": "instant",
+  "clarification_rounds": 0
+}

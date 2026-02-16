@@ -1,0 +1,125 @@
+{
+  "kind": "coverage_report",
+  "version": "1.0",
+  "generatedAt": "2026-02-05T02:02:41.146Z",
+  "sources": {
+    "buildRequest": true,
+    "implementationPlan": true
+  },
+  "requirements": {
+    "total": 5,
+    "implemented": 5,
+    "items": [
+      {
+        "id": "REQ-23",
+        "summary": "Add Progressive Web App (PWA) support so SocialConsole is installable on mobile and desktop, including a valid web app manifest, app icons, correct metadata, and a service worker registration from the React app.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/public/manifest.webmanifest",
+          "frontend/index.html",
+          "frontend/public/service-worker.js",
+          "frontend/src/App.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/public/manifest.webmanifest",
+          "frontend/index.html",
+          "frontend/public/service-worker.js",
+          "frontend/src/App.tsx"
+        ]
+      },
+      {
+        "id": "REQ-24",
+        "summary": "Implement offline support for the PWA: cache the app shell (HTML/JS/CSS/static assets) for offline launch, and provide clear offline UI behavior (banner/empty-state messaging) when the network is unavailable.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/public/service-worker.js",
+          "frontend/src/hooks/useOnlineStatus.ts",
+          "frontend/src/components/OfflineBanner.tsx",
+          "frontend/src/components/ChatLayout.tsx",
+          "frontend/src/hooks/useQueries.ts",
+          "frontend/src/components/ChatArea.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/public/service-worker.js",
+          "frontend/src/hooks/useOnlineStatus.ts",
+          "frontend/src/components/OfflineBanner.tsx",
+          "frontend/src/components/ChatLayout.tsx",
+          "frontend/src/hooks/useQueries.ts",
+          "frontend/src/components/ChatArea.tsx"
+        ]
+      },
+      {
+        "id": "REQ-25",
+        "summary": "Add best-effort notifications using the Web Notifications API for new channel messages while the app is running (foreground or background tab), with a user-controlled enable/disable setting and permission prompt only after user interaction.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/hooks/useNotifications.ts",
+          "frontend/src/components/Header.tsx",
+          "frontend/src/components/ChatArea.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/hooks/useNotifications.ts",
+          "frontend/src/components/Header.tsx",
+          "frontend/src/components/ChatArea.tsx"
+        ]
+      },
+      {
+        "id": "REQ-26",
+        "summary": "Add an offline-friendly message compose experience: when offline, prevent sending messages to the backend and instead show a clear state (disabled send + explanation), or queue drafts locally and allow the user to resend once connectivity returns.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/components/MessageInput.tsx",
+          "frontend/src/hooks/useOnlineStatus.ts",
+          "frontend/src/hooks/useQueries.ts"
+        ],
+        "matchedFiles": [
+          "frontend/src/components/MessageInput.tsx",
+          "frontend/src/hooks/useOnlineStatus.ts",
+          "frontend/src/hooks/useQueries.ts"
+        ]
+      },
+      {
+        "id": "REQ-27",
+        "summary": "Add required PWA static assets (generated icons) to `frontend/public/assets/generated` and reference them from the manifest so install surfaces show proper app branding.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/public/assets/generated/pwa-icon.dim_512x512.png",
+          "frontend/public/assets/generated/pwa-icon.dim_192x192.png",
+          "frontend/public/assets/generated/pwa-icon-maskable.dim_512x512.png",
+          "frontend/public/manifest.webmanifest"
+        ],
+        "matchedFiles": [
+          "frontend/public/assets/generated/pwa-icon.dim_512x512.png",
+          "frontend/public/assets/generated/pwa-icon.dim_192x192.png",
+          "frontend/public/assets/generated/pwa-icon-maskable.dim_512x512.png",
+          "frontend/public/manifest.webmanifest"
+        ]
+      }
+    ]
+  },
+  "changedFiles": [
+    "build-request.json",
+    "feature_evidence.json",
+    "frontend-file-summaries.txt",
+    "frontend-implementation-plan.json",
+    "frontend/index.html",
+    "frontend/public/assets/generated/pwa-icon-maskable.dim_512x512.png",
+    "frontend/public/assets/generated/pwa-icon.dim_192x192.png",
+    "frontend/public/assets/generated/pwa-icon.dim_512x512.png",
+    "frontend/public/manifest.webmanifest",
+    "frontend/public/service-worker.js",
+    "frontend/src/App.tsx",
+    "frontend/src/components/ChatArea.tsx",
+    "frontend/src/components/ChatLayout.tsx",
+    "frontend/src/components/Header.tsx",
+    "frontend/src/components/MessageInput.tsx",
+    "frontend/src/components/OfflineBanner.tsx",
+    "frontend/src/hooks/useNotifications.ts",
+    "frontend/src/hooks/useOnlineStatus.ts",
+    "frontend/src/hooks/useQueries.ts",
+    "project_state.json",
+    "scratch/component-selection.json",
+    "spec.md",
+    "spec_vs_diff_report.json"
+  ]
+}

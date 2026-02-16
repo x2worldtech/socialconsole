@@ -1,0 +1,57 @@
+{
+  "kind": "spec_vs_diff_report",
+  "version": "1.0",
+  "generatedAt": "2026-02-05T02:02:41.121Z",
+  "summary": "Diff adds PWA manifest + service worker + registration, offline status hook and banner UI, offline-aware React Query behavior, and Web Notifications support with a user toggle. However, required generated icon image files are not shown as added, and there is evidence of a change under the prohibited `frontend/src/components/ui` path.",
+  "missing_requirements": [
+    {
+      "id": "REQ-27",
+      "requirement": "Add required PWA static assets (generated icons) to `frontend/public/assets/generated` and reference them from the manifest so install surfaces show proper app branding.",
+      "reason": "The manifest references the required icon paths, but the diff does not show the actual icon files being added under `frontend/public/assets/generated`, so the AC 'All required generated icon files exist' is not evidenced by this diff summary.",
+      "evidence": [
+        "frontend/public/manifest.webmanifest",
+        "frontend/index.html"
+      ]
+    }
+  ],
+  "hallucinated_features": [
+    {
+      "description": "Modified a file under `frontend/src/components/ui` (forbidden by constraints).",
+      "reason": "BuildRequest constraints explicitly say not to edit files under `frontend/src/components/ui`, but the diff summary indicates `frontend/src/components/ui/progress.tsx` was modified.",
+      "evidence": [
+        "frontend-file-summaries.txt"
+      ]
+    },
+    {
+      "description": "Added web app manifest shortcuts section (\"Open Chat\").",
+      "reason": "Manifest shortcuts were not requested by any requirement; only installability, basic manifest fields, and icons were required.",
+      "evidence": [
+        "frontend/public/manifest.webmanifest"
+      ]
+    },
+    {
+      "description": "Added backend connection error full-screen UI with retry in AppContent.",
+      "reason": "Not requested by REQ-23..REQ-27; this is additional functionality beyond PWA/offline/notifications/offline-compose.",
+      "evidence": [
+        "frontend/src/App.tsx"
+      ]
+    }
+  ],
+  "confidence": 0.72,
+  "changed_files": [
+    "frontend-file-summaries.txt",
+    "frontend/index.html",
+    "frontend/public/manifest.webmanifest",
+    "frontend/public/service-worker.js",
+    "frontend/src/App.tsx",
+    "frontend/src/components/ChatArea.tsx",
+    "frontend/src/components/ChatLayout.tsx",
+    "frontend/src/components/Header.tsx",
+    "frontend/src/components/MessageInput.tsx",
+    "frontend/src/components/OfflineBanner.tsx",
+    "frontend/src/hooks/useNotifications.ts",
+    "frontend/src/hooks/useOnlineStatus.ts",
+    "frontend/src/hooks/useQueries.ts",
+    "project_state.json"
+  ]
+}
